@@ -101,7 +101,7 @@ def delete_group(name: str):
 
 
 # create_group('qwerty')
-# id = _get_group('qwerty')
-# print(id)
+id = _get_group('qwerty123')
+print(id)
 # update_name_group('qwerty', new_name='qwerty123')
 # update_permissions_group('qwerty123')
