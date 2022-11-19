@@ -1,6 +1,11 @@
+import base64
+
 import requests
 import urllib3
 import environ
+from requests import Response
+
+from base_things import Extensions, BaseMy
 
 env = environ.Env()
 environ.Env.read_env('.env')
@@ -8,27 +13,7 @@ TOKEN = env('TOKEN')
 PROS = env('PROS')
 
 
-class Base:
-    def __init__(self, username: str, token: str, sub_id: str, host: str):
-        self._username = username
-        self._token = token
-        self._sub_id = sub_id
-        self._host = host
-
-    def _config(self):
-        auth = urllib3.util.make_headers(
-            basic_auth=self._username + ':' + self._token
-        ).get('authorization')
-
-        headers = {
-            'accept': 'application/json',
-            'Authorization': auth,
-            'Content-Type': 'application/json-patch+json'
-        }
-        return headers, self._sub_id
-
-
-class Templates(Base):
+class Templates(BaseMy):
     def __init__(self, username: str, token: str, sub_id: str, host: str):
         super().__init__(username, token, sub_id, host)
 
@@ -81,7 +66,7 @@ class Templates(Base):
                                      headers=headers)
         return del_folder
 
-    def delete_file(self, name: str):
+    def delete_file(self, name: str) -> Response:
         headers, sub_id = self._config()
         file = self._get_file_by_name(name)
         print(file)
@@ -94,7 +79,7 @@ class Templates(Base):
         folder = self._get_root_folder() if folder_name == 'root' else self.get_folder(folder_name)
         json = {
             "name": file_name,
-            "content": content
+            'content': content
         }
         file = requests.post(f'{self._host}/api/rp/v1/Templates/Folder/{folder.get("id")}/File', headers=headers,
                              json=json)
@@ -165,24 +150,33 @@ class Templates(Base):
 
 
 b = Templates('apikey', TOKEN, PROS, 'https://fastreport.cloud')
-# print(b.create_file('loli_hentai'))
+
+with open('lol.frx', 'rb') as f:
+    temp = base64.b64encode(f.read()).decode('utf-8')
+    print(temp)
+
+# print(b.create_file('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh', content=temp))
 # print(b._get_root_folder())
 # b.create_folder(folder_name='qwerty')
 # print(b.get_folder('qwerty'))
 # 6378a7125f620ebfce9a1ffa
 # pprint(b.delete_folder('qwerty'))
 # import base64
-# with open('lol.frx', 'r') as xml:
+# with open('lol.fpx', 'r') as xml:
 #     content = base64.b64encode(xml.read().encode('utf-8'))
 #     print(content)
 # b.create_file(file_name='lol123')
 # b.prepare_file(file_name='lol123', file_prepare_name='lol123')
-# print(b._get_file_by_name('loli_hentai'))
+id = b._get_file_by_name('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh').get('id')
+# print(b._get_file_by_name('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh').get('id'))
+
+
 # print(b._get_files_list())#6378a7fa5f620ebfce9a2037
 # print(b.export_file('lol123.fpx', format='pdf'))
-# print(b.prepare_file(file_name='lol123', file_prepare_name='lol123'))
+# print(b.prepare_file(file_name='bely_paren_v_belom_platye_vyglyazhu_kak_sheykh',
+#                      file_prepare_name='bely_paren_v_belom_platye_vyglyazhu_kak_sheykh'))
 # print(b._get_file_rep('lol123'))
-# print(b.export_file('lol123', format='pdf'))
+# print(b.export_file('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh', format=Extensions.pdf))
 # print(b.download_file('lol123.pdf'))
-print(b.delete_file('cock'))
+print(b.delete_file('Frog'))
 # print()
