@@ -1,4 +1,3 @@
-
 import requests
 import urllib3
 import environ
@@ -23,7 +22,8 @@ class Base:
 
         headers = {
             'accept': 'application/json',
-            'Authorization': auth
+            'Authorization': auth,
+            'Content-Type': 'application/json-patch+json'
         }
         return headers, self._sub_id
 
@@ -81,16 +81,25 @@ class Templates(Base):
                                      headers=headers)
         return del_folder
 
-    def create_file(self, file_name: str, folder_name: str = 'root'):
+    def delete_file(self, name: str):
+        headers, sub_id = self._config()
+        file = self._get_file_by_name(name)
+        print(file)
+        del_folder = requests.delete(f'{self._host}/api/rp/v1/Templates/File/{file.get("id")}/ToBin',
+                                     headers=headers)
+        return del_folder
+
+    def create_file(self, file_name: str, folder_name: str = 'root', content='null'):
         headers, sub_id = self._config()
         folder = self._get_root_folder() if folder_name == 'root' else self.get_folder(folder_name)
         json = {
-            "name": file_name
+            "name": file_name,
+            "content": content
         }
         file = requests.post(f'{self._host}/api/rp/v1/Templates/Folder/{folder.get("id")}/File', headers=headers,
                              json=json)
 
-        print(file.json())
+        return file.json()
 
     def _get_file_by_name(self, name: str, folder_name: str = 'root'):
         headers, sub_id = self._config()
@@ -107,7 +116,7 @@ class Templates(Base):
             "pagesCount": 2147483647
         }
         lol = requests.post(f'{self._host}/api/rp/v1/Templates/File/{file.get("id")}/Prepare', headers=headers,
-                             json=json)
+                            json=json)
         print(lol.json())
 
     def _get_root_reports_dir(self):
@@ -163,7 +172,7 @@ b = Templates('apikey', TOKEN, PROS, 'https://fastreport.cloud')
 # 6378a7125f620ebfce9a1ffa
 # pprint(b.delete_folder('qwerty'))
 # import base64
-# with open('lolka_s_chlenom-femboy.frx', 'r') as xml:
+# with open('lol.frx', 'r') as xml:
 #     content = base64.b64encode(xml.read().encode('utf-8'))
 #     print(content)
 # b.create_file(file_name='lol123')
@@ -175,3 +184,5 @@ b = Templates('apikey', TOKEN, PROS, 'https://fastreport.cloud')
 # print(b._get_file_rep('lol123'))
 # print(b.export_file('lol123', format='pdf'))
 # print(b.download_file('lol123.pdf'))
+print(b.delete_file('cock'))
+# print()
