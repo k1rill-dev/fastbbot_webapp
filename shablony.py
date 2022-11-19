@@ -1,4 +1,5 @@
 import base64
+from pprint import pprint
 
 import requests
 import urllib3
@@ -112,7 +113,7 @@ class Templates(BaseMy):
     def _get_files_list_rep(self, folder_name: str = 'root'):
         headers, sub_id = self._config()
         folder = self._get_root_reports_dir() if folder_name == 'root' else self.get_folder(folder_name)
-        response = requests.get(f'{self._host}/api/rp/v1/Reports/Folder/6377865f5f620ebfce9a07cc/ListFiles',
+        response = requests.get(f'{self._host}/api/rp/v1/Reports/Folder/6377865f5f620ebfce9a07cc/ListFiles?take=100',
                                 headers=headers)
         return response.json()
 
@@ -130,30 +131,29 @@ class Templates(BaseMy):
             "pagesCount": 2147483647,
             "format": format
         }
-        file = self._get_file_rep(file_name, folder_name=folder_name)
-        # print(file_id)
-        file = requests.post(f'{self._host}/api/rp/v1/Templates/File/{file.get("templateId")}/Export', headers=headers,
+        fileq = self._get_file_rep(file_name, folder_name=folder_name)
+        file = requests.post(f'{self._host}/api/rp/v1/Templates/File/{fileq.get("templateId")}/Export', headers=headers,
                              json=json)
         return file.json()
 
     def download_file(self, file_name: str):
         headers, sub_id = self._config()
         root_id = requests.get(f'{self._host}/api/rp/v1/Exports/Root', headers=headers).json().get('id')
-        files = requests.get(f'{self._host}/api/rp/v1/Exports/Folder/{root_id}/ListFiles', headers=headers).json()
-        file = [i for i in files.get('files') if i.get('name') == file_name][0]
+        files = requests.get(f'{self._host}/api/rp/v1/Exports/Folder/{root_id}/ListFiles?take=100', headers=headers).json()
+        file = [i for i in files.get('files') if i.get('name').split('.')[0] == f'{file_name}'][0]
+        ext = file.get('name').split('.')[1]
         response = requests.get(f'{self._host}/download/e/{file.get("id")}', headers=headers)
         wer = requests.get(response.url, headers=headers)
-        print(wer.content)
 
-        with open(f'{file_name}', 'wb') as f:
+        with open(f'{file_name}.{ext}', 'wb') as f:
             f.write(wer.content)
 
 
-b = Templates('apikey', TOKEN, PROS, 'https://fastreport.cloud')
+# b = Templates('apikey', TOKEN, PROS, 'https://fastreport.cloud')
 
-with open('lol.frx', 'rb') as f:
-    temp = base64.b64encode(f.read()).decode('utf-8')
-    print(temp)
+# with open('lol.frx', 'rb') as f:
+#     temp = base64.b64encode(f.read()).decode('utf-8')
+#     print(temp)
 
 # print(b.create_file('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh', content=temp))
 # print(b._get_root_folder())
@@ -167,7 +167,7 @@ with open('lol.frx', 'rb') as f:
 #     print(content)
 # b.create_file(file_name='lol123')
 # b.prepare_file(file_name='lol123', file_prepare_name='lol123')
-id = b._get_file_by_name('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh').get('id')
+# id = b._get_file_by_name('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh').get('id')
 # print(b._get_file_by_name('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh').get('id'))
 
 
@@ -178,5 +178,5 @@ id = b._get_file_by_name('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh').get('
 # print(b._get_file_rep('lol123'))
 # print(b.export_file('bely_paren_v_belom_platye_vyglyazhu_kak_sheykh', format=Extensions.pdf))
 # print(b.download_file('lol123.pdf'))
-print(b.delete_file('Frog'))
+# print(b.delete_file('Frog'))
 # print()

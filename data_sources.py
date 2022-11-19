@@ -2,7 +2,7 @@ import environ
 import requests
 from pprint import pprint
 
-from shablony import Base
+from shablony import BaseMy
 
 env = environ.Env()
 environ.Env.read_env('.env')
@@ -10,7 +10,7 @@ TOKEN = env('TOKEN')
 PROS = env('PROS')
 
 
-class DataSources(Base):
+class DataSources(BaseMy):
     def __init__(self, username: str, token: str, sub_id: str, host: str):
         super().__init__(username, token, sub_id, host)
 

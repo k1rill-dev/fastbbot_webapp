@@ -21,7 +21,6 @@ class Extensions:
     svg: str = 'svg'
 
 
-
 class BaseMy:
     def __init__(self, username: str, token: str, sub_id: str, host: str):
         self._username = username
