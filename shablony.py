@@ -140,12 +140,13 @@ class Templates(BaseMy):
         headers, sub_id = self._config()
         root_id = requests.get(f'{self._host}/api/rp/v1/Exports/Root', headers=headers).json().get('id')
         files = requests.get(f'{self._host}/api/rp/v1/Exports/Folder/{root_id}/ListFiles?take=100', headers=headers).json()
-        file = [i for i in files.get('files') if i.get('name').split('.')[0] == f'{file_name}'][0]
-        ext = file.get('name').split('.')[1]
+        f = file_name.split('.')[0]
+        # print(f)
+        file = [i for i in files.get('files') if i.get('name').split('.')[0] == f'{f}'][0]
         response = requests.get(f'{self._host}/download/e/{file.get("id")}', headers=headers)
         wer = requests.get(response.url, headers=headers)
 
-        with open(f'{file_name}.{ext}', 'wb') as f:
+        with open(f'{file_name}', 'wb') as f:
             f.write(wer.content)
 
 
